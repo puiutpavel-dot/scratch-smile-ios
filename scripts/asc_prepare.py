@@ -23,7 +23,7 @@ import jwt  # PyJWT
 
 BASE = "https://api.appstoreconnect.apple.com"
 BUNDLE_ID = os.environ["BUNDLE_ID"]
-APP_NAME = os.environ.get("APP_NAME", "Lozuri")
+APP_NAME = os.environ.get("APP_NAME", "ScratchSmile")
 
 
 def private_key() -> str:

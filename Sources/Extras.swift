@@ -110,6 +110,7 @@ enum Stats {
 struct Achievement: Identifiable {
     /// Trebuie să fie identic cu ID-ul realizării din App Store Connect.
     let id: String
+    /// Chei din tabelul de traduceri.
     let title: String
     let detail: String
     let isDone: () -> Bool
@@ -119,17 +120,17 @@ enum Achievements {
     private static let store = UserDefaults.standard
 
     static let all: [Achievement] = [
-        Achievement(id: "lozuri.primul_jackpot", title: "👑 Primul jackpot", detail: "Câștigă un jackpot") {
+        Achievement(id: "scratchsmile.first_jackpot", title: "ach.jackpot.title", detail: "ach.jackpot.detail") {
             store.integer(forKey: "statJackpots") >= 1
         },
-        Achievement(id: "lozuri.100_lozuri", title: "🎟️ Răzuitor de cursă lungă", detail: "Răzuiește 100 de lozuri") {
+        Achievement(id: "scratchsmile.100_tickets", title: "ach.100.title", detail: "ach.100.detail") {
             store.integer(forKey: "statTickets") >= 100
         },
-        Achievement(id: "lozuri.serie_7", title: "🔥 Săptămâna perfectă", detail: "Ia bonusul 7 zile la rând") {
+        Achievement(id: "scratchsmile.streak_7", title: "ach.streak.title", detail: "ach.streak.detail") {
             store.integer(forKey: "statBestStreak") >= 7
         },
-        Achievement(id: "lozuri.toate_mesajele", title: "💬 Înțeleptul", detail: "Descoperă toate mesajele") {
-            seenMessageIndices(store.string(forKey: "seenMessages") ?? "").count >= TicketScreen.losingMessages.count
+        Achievement(id: "scratchsmile.all_messages", title: "ach.msgs.title", detail: "ach.msgs.detail") {
+            seenMessageIndices(store.string(forKey: "seenMessages") ?? "").count >= TicketScreen.losingMessageCount
         },
     ]
 
@@ -159,20 +160,20 @@ struct StatsScreen: View {
 
     var body: some View {
         List {
-            Section("Statistici") {
-                LabeledContent("Lozuri răzuite", value: "\(tickets)")
-                LabeledContent("Monede câștigate în total", value: "\(totalWon)")
-                LabeledContent("Cel mai mare câștig", value: "\(biggestWin)")
-                LabeledContent("Jackpoturi", value: "\(jackpots)")
-                LabeledContent("Cea mai lungă serie", value: "\(bestStreak) zile")
+            Section(L("stats.title")) {
+                LabeledContent(L("stats.tickets"), value: "\(tickets)")
+                LabeledContent(L("stats.total"), value: "\(totalWon)")
+                LabeledContent(L("stats.biggest"), value: "\(biggestWin)")
+                LabeledContent(L("stats.jackpots"), value: "\(jackpots)")
+                LabeledContent(L("stats.streak"), value: "\(bestStreak)")
             }
 
-            Section("Realizări") {
+            Section(L("ach.title")) {
                 ForEach(Achievements.all) { achievement in
                     HStack {
                         VStack(alignment: .leading) {
-                            Text(achievement.title).font(.headline)
-                            Text(achievement.detail).font(.subheadline).foregroundStyle(.secondary)
+                            Text(L(achievement.title)).font(.headline)
+                            Text(L(achievement.detail)).font(.subheadline).foregroundStyle(.secondary)
                         }
                         Spacer()
                         Text(achievement.isDone() ? "✅" : "🔒")
@@ -180,7 +181,7 @@ struct StatsScreen: View {
                 }
             }
         }
-        .navigationTitle("Statistici")
+        .navigationTitle(L("stats.title"))
     }
 }
 
@@ -194,15 +195,15 @@ struct SettingsScreen: View {
     var body: some View {
         Form {
             Section {
-                Toggle("Sunet", isOn: $soundOn)
-                Toggle("Vibrație", isOn: $hapticsOn)
+                Toggle(L("settings.sound"), isOn: $soundOn)
+                Toggle(L("settings.haptics"), isOn: $hapticsOn)
             }
             Section {
-                Toggle("Atinge ca să dezvălui", isOn: $tapToReveal)
+                Toggle(L("settings.tap"), isOn: $tapToReveal)
             } footer: {
-                Text("Lozul se dezvăluie la o singură atingere, fără răzuit cu degetul.")
+                Text(L("settings.tap.footer"))
             }
         }
-        .navigationTitle("Setări")
+        .navigationTitle(L("settings.title"))
     }
 }

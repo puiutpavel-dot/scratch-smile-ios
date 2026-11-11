@@ -24,8 +24,8 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  BUNDLE_ID: ro.draghicioiu.lozuri
-  APP_NAME: Lozuri
+  BUNDLE_ID: ro.draghicioiu.scratchsmile
+  APP_NAME: ScratchSmile
   OUT_DIR: ${{ github.workspace }}/ci-out
   ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
   ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}

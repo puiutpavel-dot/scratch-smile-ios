@@ -1,7 +1,7 @@
 import SwiftUI
 
 @main
-struct LozuriApp: App {
+struct ScratchSmileApp: App {
     var body: some Scene {
         WindowGroup {
             LobbyScreen()

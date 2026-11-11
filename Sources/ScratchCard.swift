@@ -13,7 +13,13 @@ func seenMessageIndices(_ stored: String) -> Set<Int> {
 }
 
 /// Numele aplicației, afișat pe imaginile trimise. Schimbă-l cu numele tău final.
-let appName = "Lozuri"
+let appName = "Scratch & Smile"
+
+/// Textul în limba telefonului (vezi tools/l10n.py). Valorile se trec ca text: L("win", "\(prize)").
+func L(_ key: String, _ args: CVarArg...) -> String {
+    let format = NSLocalizedString(key, comment: "")
+    return args.isEmpty ? format : String(format: format, locale: Locale.current, arguments: args)
+}
 
 // MARK: - Logica de câștig (rezultatul se decide ÎNAINTE de răzuit)
 
@@ -130,7 +136,7 @@ struct ScratchCardView<Content: View>: View {
                     context.fill(Path(ellipseIn: rect), with: .color(color))
                 }
             }
-            Text(tapToReveal ? "ATINGE AICI" : "RĂZUIEȘTE AICI")
+            Text(L(tapToReveal ? "cover.tap" : "cover.scratch"))
                 .font(.headline)
                 .foregroundStyle(Color.white.opacity(0.85))
         }
@@ -264,12 +270,12 @@ struct TicketScreen: View {
 
     var body: some View {
         VStack(spacing: 24) {
-            Text("💰 \(coins) monede").font(.title2.bold())
-                .navigationTitle(type.name)
+            Text(verbatim: "💰 \(coins)").font(.title2.bold())
+                .navigationTitle(type.title)
 
             if let ticket {
                 if let lucky = ticket.luckyNumber {
-                    Text("🍀 Numărul tău norocos: \(lucky)").font(.title3.bold())
+                    Text(L("lucky.number", "\(lucky)")).font(.title3.bold())
                 }
                 ScratchCardView(showHint: isWelcome, onReveal: { settle(ticket) }) {
                     LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 3), spacing: 12) {
@@ -286,23 +292,23 @@ struct TicketScreen: View {
                 RoundedRectangle(cornerRadius: 16)
                     .fill(Color.secondary.opacity(0.15))
                     .frame(height: 280)
-                    .overlay(Text("Cumpără un loz ca să joci"))
+                    .overlay(Text(L("ticket.empty")))
             }
 
             Text(resultText).font(.headline).multilineTextAlignment(.center)
 
             if let shareImage {
                 ShareLink(item: shareImage, preview: SharePreview(appName, image: shareImage)) {
-                    Label("Trimite unui prieten", systemImage: "square.and.arrow.up")
+                    Label(L("share.friend"), systemImage: "square.and.arrow.up")
                 }
                 if MFMessageComposeViewController.canSendText() {
                     Button { showMessageComposer = true } label: {
-                        Label("Trimite prin Mesaje", systemImage: "message.fill")
+                        Label(L("share.messages"), systemImage: "message.fill")
                     }
                 }
             }
 
-            Button(freeAvailable ? "🎟️ Răzuiește lozul gratuit" : "Cumpără loz (\(price) monede)") { buy() }
+            Button(freeAvailable ? L("buy.free") : L("buy.paid", "\(price)")) { buy() }
                 .buttonStyle(.borderedProminent)
                 .disabled(!freeAvailable && coins < price)
         }
@@ -314,7 +320,7 @@ struct TicketScreen: View {
                 didOnboard = true
                 settled = false
                 ticket = Ticket(type: type)
-                resultText = "Primul loz e din partea casei. Răzuiește-l cu degetul!"
+                resultText = L("welcome")
             }
         }
         .sheet(isPresented: $showMessageComposer) {
@@ -355,7 +361,7 @@ struct TicketScreen: View {
                 Feedback.lose()
             }
         }
-        resultText = ticket.prize > 0 ? "Ai câștigat \(ticket.prize) monede! 🎉" : nextLosingMessage()
+        resultText = ticket.prize > 0 ? L("win", "\(ticket.prize)") : nextLosingMessage()
 
         // Imaginea pentru butonul „Trimite”.
         let renderer = ImageRenderer(content: ShareCard(text: resultText, emoji: type.emoji))
@@ -381,30 +387,11 @@ struct TicketScreen: View {
         return message
     }
 
-    static let losingMessages = [
-        // Amuzante
-        "Lozul ăsta a fost la dietă: zero premii. 🥗",
-        "Ai câștigat experiență. Din păcate, nu se acceptă la magazin. 😅",
-        "Premiul a plecat în concediu. Revine el. 🏖️",
-        "Felicitări! Ai găsit unul dintre lozurile fără premiu. Sunt destule. 🙃",
-        "Degetul tău a muncit degeaba, dar măcar a făcut sport. 💪",
-        "Nimic aici. Nici măcar o scuză. 🤷",
-        "Lozul zice: nu ești tu de vină, eu sunt. 💔",
-        "Atâta răzuit și nici măcar o cireașă. 🍒",
-        "Monedele tale au plecat într-o lume mai bună. 🕊️",
-        "Dacă ghinionul ar fi sport, azi luai aurul. 🥇",
-        // Sfaturi despre viață
-        "Sfatul zilei: bea un pahar cu apă. Lozul poate aștepta. 💧",
-        "Sun-o pe mama. Ăla e câștig sigur. 📞",
-        "Nu compara viața ta cu lozul altuia. 🌱",
-        "Cine se culcă devreme câștigă măcar somnul. 😴",
-        "Norocul și-l mai face omul și cu mâna lui. Ieși la o plimbare. 🚶",
-        "Un zâmbet nu costă nicio monedă. Dă unul azi. 😊",
-        "Lucrurile bune vin încet. Lozurile proaste vin repede. ⏳",
-        "Spune-i cuiva că îl apreciezi. Premiu garantat. ❤️",
-        "Întinde-te puțin. Spatele tău nu e monedă virtuală. 🧘",
-        "Ai pierdut un loz, nu ziua. Fă ceva frumos cu ea. ☀️",
-    ]
+    /// Cele 20 de mesaje (glume și sfaturi), în limba telefonului: cheile msg.0 … msg.19.
+    static let losingMessageCount = 20
+    static var losingMessages: [String] {
+        (0..<losingMessageCount).map { L("msg.\($0)") }
+    }
 }
 
 /// Un loz gratuit la fiecare 4 ore.
@@ -414,7 +401,9 @@ let freeTicketInterval: Double = 4 * 60 * 60
 
 struct TicketType: Identifiable, Hashable {
     let id: String
+    /// Cheia numelui din tabelul de traduceri (ex. "ticket.bronze").
     let name: String
+    var title: String { L(name) }
     let emoji: String
     let price: Int
     let color: Color
@@ -448,31 +437,31 @@ struct TicketType: Identifiable, Hashable {
 
     static let all: [TicketType] = [
         // Câștiguri dese și mici — returnare medie 86%
-        TicketType(id: "bronze", name: "Lozul de Bronz", emoji: "🥉", price: 50, color: .brown,
+        TicketType(id: "bronze", name: "ticket.bronze", emoji: "🥉", price: 50, color: .brown,
                    weights: [60, 30, 9, 1], multipliers: [0, 1, 4, 20]),
         // Echilibrat — returnare medie 95%
-        TicketType(id: "silver", name: "Lozul de Argint", emoji: "🥈", price: 100, color: .gray,
+        TicketType(id: "silver", name: "ticket.silver", emoji: "🥈", price: 100, color: .gray,
                    weights: [65, 25, 9, 1], multipliers: [0, 1, 5, 25]),
         // Câștiguri rare și mari — returnare medie 94%
-        TicketType(id: "gold", name: "Lozul de Aur", emoji: "🥇", price: 500, color: .yellow,
+        TicketType(id: "gold", name: "ticket.gold", emoji: "🥇", price: 500, color: .yellow,
                    weights: [80, 12, 7, 1], multipliers: [0, 1, 6, 40]),
 
         // Alt tip de joc: numărul norocos printre 6 numere — returnare medie 88%
-        TicketType(id: "lucky", name: "Numărul Norocos", emoji: "🍀", price: 150, color: .mint,
+        TicketType(id: "lucky", name: "ticket.lucky", emoji: "🍀", price: 150, color: .mint,
                    weights: [72, 18, 9, 1], multipliers: [0, 1, 5, 25],
                    game: .luckyNumber),
 
         // --- Ediții limitate ---
-        TicketType(id: "dec1", name: "Lozul de 1 Decembrie", emoji: "🇷🇴", price: 100, color: .blue,
+        TicketType(id: "dec1", name: "ticket.dec1", emoji: "🇷🇴", price: 100, color: .blue,
                    weights: [60, 28, 10, 2], multipliers: [0, 1, 4, 15],
                    symbols: ["🇷🇴", "🦅", "🏰", "🌄", "🎺", "🥁"],
                    season: Season(fromMonth: 11, fromDay: 25, toMonth: 12, toDay: 2)),
-        TicketType(id: "christmas", name: "Lozul de Crăciun", emoji: "🎄", price: 200, color: .green,
+        TicketType(id: "christmas", name: "ticket.christmas", emoji: "🎄", price: 200, color: .green,
                    weights: [65, 25, 9, 1], multipliers: [0, 1, 5, 25],
                    symbols: ["🎁", "⭐️", "🎅", "🎄", "❄️", "🔔"],
                    season: Season(fromMonth: 12, fromDay: 10, toMonth: 12, toDay: 27)),
         // Paștele își schimbă data în fiecare an: perioada de mai jos e pentru 2027 (2 mai).
-        TicketType(id: "easter", name: "Lozul de Paște", emoji: "🐣", price: 100, color: .pink,
+        TicketType(id: "easter", name: "ticket.easter", emoji: "🐣", price: 100, color: .pink,
                    weights: [65, 25, 9, 1], multipliers: [0, 1, 5, 25],
                    symbols: ["🥚", "🐣", "🐰", "🌷", "🧺", "🕯️"],
                    season: Season(fromMonth: 4, fromDay: 20, toMonth: 5, toDay: 5)),
@@ -503,7 +492,7 @@ struct ShareCard: View {
                 .font(.title2.bold())
                 .multilineTextAlignment(.center)
                 .foregroundStyle(Color.white)
-            Text(appName + " · răzuiește și tu")
+            Text(L("share.tagline", appName))
                 .font(.footnote)
                 .foregroundStyle(Color.white.opacity(0.8))
         }
@@ -523,7 +512,7 @@ struct MessagesScreen: View {
         let all = TicketScreen.losingMessages
 
         List {
-            Section("Colecția ta: \(seen.count) din \(all.count)") {
+            Section(L("messages.collection", "\(seen.count)", "\(all.count)")) {
                 ForEach(Array(all.enumerated()), id: \.offset) { index, message in
                     if seen.contains(index) {
                         HStack {
@@ -535,18 +524,19 @@ struct MessagesScreen: View {
                             .buttonStyle(.borderless)
                         }
                     } else {
-                        Text("🔒 Încă nedescoperit").foregroundStyle(.secondary)
+                        Text(L("messages.locked")).foregroundStyle(.secondary)
                     }
                 }
             }
 
-            Section("Scrie-ne") {
-                if let url = URL(string: "mailto:\(supportEmail)?subject=\(appName)") {
-                    Link("✉️ Trimite o sugestie sau o problemă", destination: url)
+            Section(L("messages.contact")) {
+                if let subject = appName.addingPercentEncoding(withAllowedCharacters: .alphanumerics),
+                   let url = URL(string: "mailto:\(supportEmail)?subject=\(subject)") {
+                    Link(L("messages.contact.link"), destination: url)
                 }
             }
         }
-        .navigationTitle("Mesaje")
+        .navigationTitle(L("messages.title"))
     }
 }
 
@@ -565,7 +555,7 @@ struct MessageComposer: UIViewControllerRepresentable {
         let controller = MFMessageComposeViewController()
         controller.body = text
         if let imageData {
-            controller.addAttachmentData(imageData, typeIdentifier: "public.png", filename: "loz.png")
+            controller.addAttachmentData(imageData, typeIdentifier: "public.png", filename: "ticket.png")
         }
         controller.messageComposeDelegate = context.coordinator
         return controller
@@ -603,8 +593,8 @@ enum Reminders {
 
     /// Peste 4 ore: „lozul gratuit e gata”.
     static func freeTicketReady() {
-        schedule(id: "freeTicket", title: "🎟️ Lozul tău gratuit e gata",
-                 body: "Vino să-l răzuiești. Poate azi e ziua ta!",
+        schedule(id: "freeTicket", title: L("notif.free.title"),
+                 body: L("notif.free.body"),
                  trigger: UNTimeIntervalNotificationTrigger(timeInterval: freeTicketInterval, repeats: false))
     }
 
@@ -613,8 +603,8 @@ enum Reminders {
         guard let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: Date()) else { return }
         var parts = Calendar.current.dateComponents([.year, .month, .day], from: tomorrow)
         parts.hour = 19
-        schedule(id: "streak", title: "🔥 Nu-ți pierde seria de \(day) zile",
-                 body: "Bonusul de azi te așteaptă. Mâine o iei de la capăt!",
+        schedule(id: "streak", title: L("notif.streak.title", "\(day)"),
+                 body: L("notif.streak.body"),
                  trigger: UNCalendarNotificationTrigger(dateMatching: parts, repeats: false))
     }
 }
@@ -623,7 +613,7 @@ enum Reminders {
 
 enum GameCenter {
     /// Trebuie să fie identic cu ID-ul clasamentului creat în App Store Connect.
-    static let leaderboardID = "lozuri.monede"
+    static let leaderboardID = "scratchsmile.coins"
 
     static func authenticate() {
         GKLocalPlayer.local.authenticateHandler = { viewController, _ in
@@ -675,17 +665,17 @@ struct LobbyScreen: View {
         let remaining = freeTicketInterval - (now.timeIntervalSince1970 - lastFreeTicketTime)
         guard remaining > 0 else { return nil }
         let minutes = Int(remaining / 60) + 1
-        return "Următorul loz gratuit în \(minutes / 60)h \(minutes % 60)m"
+        return L("lobby.free.wait", "\(minutes / 60)h \(minutes % 60)m")
     }
 
     var body: some View {
         NavigationStack {
             List {
                 Section {
-                    Text("💰 \(coins) monede").font(.title.bold())
+                    Text(verbatim: "💰 \(coins)").font(.title.bold())
                     Button(bonusAvailable
-                           ? "🎁 Bonus ziua \(nextStreakDay) din 7 (+\(dailyBonus))"
-                           : "Bonus luat azi (ziua \(bonusStreak) din 7). Revino mâine!") {
+                           ? L("lobby.bonus.claim", "\(nextStreakDay)", "\(dailyBonus)")
+                           : L("lobby.bonus.taken", "\(bonusStreak)")) {
                         let day = nextStreakDay
                         coins += dailyBonus
                         bonusStreak = day
@@ -698,25 +688,25 @@ struct LobbyScreen: View {
                     // Se reîmprospătează singur în fiecare minut.
                     TimelineView(.periodic(from: .now, by: 60)) { context in
                         let waiting = freeTicketLabel(at: context.date)
-                        Button(waiting ?? "🎟️ Loz de Bronz gratuit") { showFreeTicket = true }
+                        Button(waiting ?? L("lobby.free")) { showFreeTicket = true }
                             .disabled(waiting != nil)
                     }
 
-                    Button("🏆 Clasament") { GameCenter.showLeaderboard() }
-                    NavigationLink("💬 Mesaje") { MessagesScreen() }
+                    Button(L("lobby.leaderboard")) { GameCenter.showLeaderboard() }
+                    NavigationLink(L("lobby.messages")) { MessagesScreen() }
                 }
 
-                Section("Alege un loz") {
+                Section(L("lobby.choose")) {
                     ForEach(TicketType.available) { type in
                         NavigationLink(value: type) {
                             HStack {
                                 Text(type.emoji).font(.largeTitle)
                                 VStack(alignment: .leading) {
-                                    Text(type.name).font(.headline)
+                                    Text(type.title).font(.headline)
                                     if type.season != nil {
-                                        Text("EDIȚIE LIMITATĂ").font(.caption2.bold()).foregroundStyle(.red)
+                                        Text(L("lobby.limited")).font(.caption2.bold()).foregroundStyle(.red)
                                     }
-                                    Text("\(type.price) monede · premiu maxim \(type.price * type.multiplier(for: .jackpot))")
+                                    Text(L("lobby.ticket.info", "\(type.price)", "\(type.price * type.multiplier(for: .jackpot))"))
                                         .font(.subheadline)
                                         .foregroundStyle(.secondary)
                                 }
@@ -728,7 +718,7 @@ struct LobbyScreen: View {
                 }
             }
             .safeAreaInset(edge: .bottom) {
-                Text("Monedele sunt virtuale și nu pot fi schimbate în bani sau premii.")
+                Text(L("lobby.disclaimer"))
                     .font(.footnote)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
@@ -736,7 +726,7 @@ struct LobbyScreen: View {
                     .frame(maxWidth: .infinity)
                     .background(.bar)
             }
-            .navigationTitle("Lozuri")
+            .navigationTitle(appName)
             .onAppear {
                 GameCenter.authenticate()
                 GameCenter.submit(coins: coins)
