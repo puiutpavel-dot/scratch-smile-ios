@@ -725,6 +725,8 @@ enum GameCenter {
     static let leaderboardID = "scratchsmile.coins"
 
     static func authenticate() {
+        // Folosit doar la capturile automate din simulator.
+        guard !UserDefaults.standard.bool(forKey: "skipGameCenter") else { return }
         GKLocalPlayer.local.authenticateHandler = { viewController, _ in
             guard let viewController else { return }
             let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene

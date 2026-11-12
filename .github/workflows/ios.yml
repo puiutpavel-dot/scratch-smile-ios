@@ -1,6 +1,7 @@
 # Build iOS pe GitHub Actions, fără Mac.
 # Pornire: GitHub → Actions → „iOS” → Run workflow → alegi acțiunea.
 #   verificare  – generează proiectul și compilează pentru simulator (nu are nevoie de secrete)
+#   capturi     – verificare + capturi de ecran din simulator (lobby și un loz)
 #   testflight  – verificare + build semnat urcat în TestFlight
 #
 # Secrete necesare pentru testflight (Settings → Secrets and variables → Actions):
@@ -13,7 +14,7 @@ on:
       actiune:
         description: Ce rulez
         type: choice
-        options: [verificare, testflight]
+        options: [verificare, capturi, testflight]
         default: verificare
   push:
     branches: [main]
@@ -61,6 +62,10 @@ jobs:
       - name: Build pentru simulator
         run: bash scripts/ci/sim_build.sh
 
+      - name: Capturi de ecran din simulator
+        if: inputs.actiune == 'capturi'
+        run: bash scripts/ci/screenshots.sh
+
       - uses: actions/setup-python@v5
         if: inputs.actiune == 'testflight'
         with:
@@ -83,4 +88,6 @@ jobs:
           name: jurnale-${{ github.run_number }}
           if-no-files-found: ignore
           retention-days: 14
-          path: ci-out/*.log
+          path: |
+            ci-out/*.log
+            ci-out/*.png
