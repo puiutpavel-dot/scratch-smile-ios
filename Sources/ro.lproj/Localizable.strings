@@ -9,6 +9,8 @@
 "buy.paid" = "Cumpără loz (%@ 💰)";
 "welcome" = "Primul loz e din partea casei. Răzuiește-l cu degetul!";
 "win" = "Ai câștigat %@ 💰! 🎉";
+"rule.match3" = "Găsește 3 simboluri identice ca să câștigi";
+"rule.lucky" = "Câștigi dacă numărul tău norocos apare pe loz";
 "ticket.bronze" = "Lozul de Bronz";
 "ticket.silver" = "Lozul de Argint";
 "ticket.gold" = "Lozul de Aur";

@@ -178,8 +178,20 @@ struct TicketFrame<Content: View>: View {
         .padding(.horizontal, 16)
     }
 
-    /// Tabelul de premii: ce aduce fiecare combinație câștigătoare.
+    /// Regula de câștig, apoi tabelul de premii: ce aduce fiecare combinație câștigătoare.
     private var footer: some View {
+        VStack(spacing: 6) {
+            Text(L(type.game == .luckyNumber ? "rule.lucky" : "rule.match3"))
+                .font(.system(.footnote, design: .rounded).weight(.bold))
+                .foregroundStyle(Color.white)
+                .multilineTextAlignment(.center)
+                .lineLimit(2)
+                .minimumScaleFactor(0.8)
+            prizeTable
+        }
+    }
+
+    private var prizeTable: some View {
         HStack(spacing: 0) {
             ForEach(Array([Outcome.moneyBack, .medium, .jackpot].enumerated()), id: \.offset) { index, outcome in
                 if index > 0 { Spacer(minLength: 4) }

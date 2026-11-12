@@ -9,6 +9,8 @@
 "buy.paid" = "Buy ticket (%@ 💰)";
 "welcome" = "Your first ticket is on the house. Scratch it with your finger!";
 "win" = "You won %@ 💰! 🎉";
+"rule.match3" = "Find 3 matching symbols to win";
+"rule.lucky" = "You win if your lucky number is on the ticket";
 "ticket.bronze" = "Bronze Ticket";
 "ticket.silver" = "Silver Ticket";
 "ticket.gold" = "Gold Ticket";

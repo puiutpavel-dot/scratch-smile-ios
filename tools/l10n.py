@@ -23,6 +23,9 @@ T = {
     "welcome": ["Primul loz e din partea casei. Răzuiește-l cu degetul!", "Your first ticket is on the house. Scratch it with your finger!", "El primer boleto invita la casa. ¡Ráscalo con el dedo!", "Le premier ticket est offert par la maison. Gratte-le avec le doigt !", "Das erste Los geht aufs Haus. Rubble es mit dem Finger frei!", "Il primo biglietto lo offre la casa. Grattalo con il dito!", "A primeira raspadinha é por conta da casa. Raspe com o dedo!"],
     "win": ["Ai câștigat %@ 💰! 🎉", "You won %@ 💰! 🎉", "¡Has ganado %@ 💰! 🎉", "Tu as gagné %@ 💰 ! 🎉", "Du hast %@ 💰 gewonnen! 🎉", "Hai vinto %@ 💰! 🎉", "Você ganhou %@ 💰! 🎉"],
 
+    "rule.match3": ["Găsește 3 simboluri identice ca să câștigi", "Find 3 matching symbols to win", "Encuentra 3 símbolos iguales para ganar", "Trouve 3 symboles identiques pour gagner", "Finde 3 gleiche Symbole, um zu gewinnen", "Trova 3 simboli uguali per vincere", "Encontre 3 símbolos iguais para ganhar"],
+    "rule.lucky": ["Câștigi dacă numărul tău norocos apare pe loz", "You win if your lucky number is on the ticket", "Ganas si tu número de la suerte aparece en el boleto", "Tu gagnes si ton numéro porte-bonheur est sur le ticket", "Du gewinnst, wenn deine Glückszahl auf dem Los steht", "Vinci se il tuo numero fortunato è sul biglietto", "Você ganha se o seu número da sorte aparecer na raspadinha"],
+
     # --- tipuri de lozuri
     "ticket.bronze": ["Lozul de Bronz", "Bronze Ticket", "Boleto de Bronce", "Ticket Bronze", "Bronzelos", "Biglietto di Bronzo", "Raspadinha de Bronze"],
     "ticket.silver": ["Lozul de Argint", "Silver Ticket", "Boleto de Plata", "Ticket Argent", "Silberlos", "Biglietto d'Argento", "Raspadinha de Prata"],

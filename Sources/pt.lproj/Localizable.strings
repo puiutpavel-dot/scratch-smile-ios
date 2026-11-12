@@ -9,6 +9,8 @@
 "buy.paid" = "Comprar raspadinha (%@ 💰)";
 "welcome" = "A primeira raspadinha é por conta da casa. Raspe com o dedo!";
 "win" = "Você ganhou %@ 💰! 🎉";
+"rule.match3" = "Encontre 3 símbolos iguais para ganhar";
+"rule.lucky" = "Você ganha se o seu número da sorte aparecer na raspadinha";
 "ticket.bronze" = "Raspadinha de Bronze";
 "ticket.silver" = "Raspadinha de Prata";
 "ticket.gold" = "Raspadinha de Ouro";

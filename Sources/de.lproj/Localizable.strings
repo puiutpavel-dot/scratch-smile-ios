@@ -9,6 +9,8 @@
 "buy.paid" = "Los kaufen (%@ 💰)";
 "welcome" = "Das erste Los geht aufs Haus. Rubble es mit dem Finger frei!";
 "win" = "Du hast %@ 💰 gewonnen! 🎉";
+"rule.match3" = "Finde 3 gleiche Symbole, um zu gewinnen";
+"rule.lucky" = "Du gewinnst, wenn deine Glückszahl auf dem Los steht";
 "ticket.bronze" = "Bronzelos";
 "ticket.silver" = "Silberlos";
 "ticket.gold" = "Goldlos";
