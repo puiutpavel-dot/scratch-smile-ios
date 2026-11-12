@@ -80,7 +80,8 @@ jobs:
         if: inputs.actiune == 'app-store' || inputs.actiune == 'capturi' || inputs.actiune == 'fisa'
         run: |
           mkdir -p /tmp/thumbs
-          for f in ci-out/screenshots/ro_*.png ci-out/screenshots/en-US_01*.png; do
+          ls -l ci-out/screenshots | awk '{print $5, $9}'
+          for f in ci-out/screenshots/ro_*.png ci-out/screenshots/en-US_0[12]*.png; do
             n=$(basename "$f" .png)
             sips -s format jpeg -s formatOptions 55 --resampleWidth 330 "$f" --out "/tmp/thumbs/$n.jpg" >/dev/null
             echo "THUMB:$n:$(base64 -i "/tmp/thumbs/$n.jpg" | tr -d '\n')"

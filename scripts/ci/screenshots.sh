@@ -37,6 +37,14 @@ for SPEC in $SPECS; do
     xcrun simctl launch "$UDID" "$BUNDLE_ID" "${COMMON[@]}" $(args_for "$N") -AppleLanguages "($LANG)" -AppleLocale "$REGION" >/dev/null
     sleep 8
     xcrun simctl io "$UDID" screenshot "$OUT/$DIR/$(printf %02d $I)_scratch.png" >/dev/null 2>&1
+    # Dacă aplicația nu mai rulează la momentul capturii, a căzut: oprește tot, cu motivul.
+    if ! xcrun simctl spawn "$UDID" launchctl list | grep -q "$BUNDLE_ID"; then
+      echo "::error::Aplicația nu rula la captura $N ($DIR)"
+      for r in ~/Library/Logs/DiagnosticReports/ScratchSmile*.ips; do
+        [ -f "$r" ] && { echo "--- $r"; grep -m1 -A25 '"exception"' "$r" | cut -c1-300; grep -m1 -B2 -A30 '"faultingThread"' "$r" | grep -o '"symbol":"[^"]*"' | head -25; }
+      done
+      exit 1
+    fi
   done
   for f in "$OUT/$DIR/"*.png; do cp "$f" "$OUT_DIR/screenshots/${DIR}_$(basename "$f")"; done
   echo "Capturi $DIR: $(ls "$OUT/$DIR" | wc -l)"
