@@ -36,7 +36,16 @@ for SPEC in $SPECS; do
     # shellcheck disable=SC2046
     xcrun simctl launch "$UDID" "$BUNDLE_ID" "${COMMON[@]}" $(args_for "$N") -AppleLanguages "($LANG)" -AppleLocale "$REGION" >/dev/null
     sleep 8
-    xcrun simctl io "$UDID" screenshot "$OUT/$DIR/$(printf %02d $I)_scratch.png" >/dev/null 2>&1
+    FILE="$OUT/$DIR/$(printf %02d $I)_scratch.png"
+    xcrun simctl io "$UDID" screenshot "$FILE" >/dev/null 2>&1
+    # O captură aproape goală (ecran negru: aplicația încă pornea) e mult mai mică; mai așteaptă și reia.
+    for TRY in 1 2 3; do
+      [ "$(stat -f%z "$FILE")" -gt 600000 ] && break
+      echo "Captura $N ($DIR) pare goală, reiau (încercarea $TRY)"
+      sleep 6
+      xcrun simctl io "$UDID" screenshot "$FILE" >/dev/null 2>&1
+    done
+    [ "$(stat -f%z "$FILE")" -gt 600000 ] || { echo "::error::Captura $N ($DIR) a rămas goală"; exit 1; }
     # Dacă aplicația nu mai rulează la momentul capturii, a căzut: oprește tot, cu motivul.
     if ! xcrun simctl spawn "$UDID" launchctl list | grep -q "$BUNDLE_ID"; then
       echo "::error::Aplicația nu rula la captura $N ($DIR)"

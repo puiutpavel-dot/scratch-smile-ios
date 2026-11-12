@@ -196,16 +196,20 @@ def main():
         "notes": read("review_information/notes.txt"),
         "demoAccountRequired": False,
     }.items() if v is not None}
-    existing = api("GET", f"/v1/appStoreVersions/{vid}/appStoreReviewDetail", ok=(200, 404))
-    if existing.get("data"):
-        rid = existing["data"]["id"]
-        api("PATCH", f"/v1/appStoreReviewDetails/{rid}", {"data": {
-            "type": "appStoreReviewDetails", "id": rid, "attributes": review}})
-    else:
-        api("POST", "/v1/appStoreReviewDetails", {"data": {
-            "type": "appStoreReviewDetails", "attributes": review,
-            "relationships": {"appStoreVersion": {"data": {"type": "appStoreVersions", "id": vid}}}}})
-    print("Date pentru review: completate")
+    try:
+        existing = api("GET", f"/v1/appStoreVersions/{vid}/appStoreReviewDetail", ok=(200, 404))
+        if existing.get("data"):
+            rid = existing["data"]["id"]
+            api("PATCH", f"/v1/appStoreReviewDetails/{rid}", {"data": {
+                "type": "appStoreReviewDetails", "id": rid, "attributes": review}})
+        else:
+            api("POST", "/v1/appStoreReviewDetails", {"data": {
+                "type": "appStoreReviewDetails", "attributes": review,
+                "relationships": {"appStoreVersion": {"data": {"type": "appStoreVersions", "id": vid}}}}})
+        print("Date pentru review: completate")
+    except SystemExit as err:
+        # De obicei lipsește telefonul de contact (review_information/phone_number.txt).
+        print(f"ATENȚIE: datele pentru review nu au fost salvate; se completează din App Store Connect.\n{str(err)[:600]}")
     print("Gata.")
 
 
