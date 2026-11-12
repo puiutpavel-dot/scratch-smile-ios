@@ -36,6 +36,14 @@
 "lobby.limited" = "ÉDITION LIMITÉE";
 "lobby.ticket.info" = "%1$@ 💰 · gain maximum %2$@ 💰";
 "lobby.disclaimer" = "Les pièces sont virtuelles et ne peuvent pas être échangées contre de l'argent ou des lots.";
+"share.bonus.row" = "📣 Partage et gagne %@ 💰";
+"share.bonus.title" = "Bonus de partage";
+"share.bonus.info" = "Partage l'app sur un réseau social et reçois %@ 💰. Le bonus est accordé une seule fois par réseau.";
+"share.bonus.button" = "Partager maintenant";
+"share.bonus.done" = "Reçu";
+"share.bonus.got" = "+%1$@ 💰 pour %2$@ ! 🎉";
+"share.bonus.none" = "Merci ! Le bonus ne vaut que pour les réseaux de la liste, une fois chacun.";
+"share.bonus.text" = "Je gratte des tickets virtuels dans %@. Essaie toi aussi ! 🎟️";
 "messages.title" = "Messages";
 "messages.collection" = "Ta collection : %1$@ sur %2$@";
 "messages.locked" = "🔒 Pas encore découvert";

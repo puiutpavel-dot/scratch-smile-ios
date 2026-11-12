@@ -36,6 +36,14 @@
 "lobby.limited" = "EDIÇÃO LIMITADA";
 "lobby.ticket.info" = "%1$@ 💰 · prêmio máximo %2$@ 💰";
 "lobby.disclaimer" = "As moedas são virtuais e não podem ser trocadas por dinheiro ou prêmios.";
+"share.bonus.row" = "📣 Compartilhe e ganhe %@ 💰";
+"share.bonus.title" = "Bônus de compartilhamento";
+"share.bonus.info" = "Compartilhe o app em uma rede social e ganhe %@ 💰. O bônus é concedido uma única vez por rede.";
+"share.bonus.button" = "Compartilhar agora";
+"share.bonus.done" = "Recebido";
+"share.bonus.got" = "+%1$@ 💰 por %2$@! 🎉";
+"share.bonus.none" = "Obrigado! O bônus vale só para as redes da lista, uma vez cada.";
+"share.bonus.text" = "Estou raspando raspadinhas virtuais no %@. Experimente também! 🎟️";
 "messages.title" = "Mensagens";
 "messages.collection" = "Sua coleção: %1$@ de %2$@";
 "messages.locked" = "🔒 Ainda não descoberto";

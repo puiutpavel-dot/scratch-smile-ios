@@ -36,6 +36,14 @@
 "lobby.limited" = "LIMITIERTE EDITION";
 "lobby.ticket.info" = "%1$@ 💰 · Höchstgewinn %2$@ 💰";
 "lobby.disclaimer" = "Die Münzen sind virtuell und können nicht gegen Geld oder Preise eingetauscht werden.";
+"share.bonus.row" = "📣 Teilen und %@ 💰 erhalten";
+"share.bonus.title" = "Teilen-Bonus";
+"share.bonus.info" = "Teile die App in einem sozialen Netzwerk und erhalte %@ 💰. Den Bonus gibt es einmal pro Netzwerk.";
+"share.bonus.button" = "Jetzt teilen";
+"share.bonus.done" = "Erhalten";
+"share.bonus.got" = "+%1$@ 💰 für %2$@! 🎉";
+"share.bonus.none" = "Danke! Den Bonus gibt es nur für die aufgeführten Netzwerke, jeweils einmal.";
+"share.bonus.text" = "Ich rubble virtuelle Lose in %@. Probier es auch! 🎟️";
 "messages.title" = "Nachrichten";
 "messages.collection" = "Deine Sammlung: %1$@ von %2$@";
 "messages.locked" = "🔒 Noch nicht entdeckt";

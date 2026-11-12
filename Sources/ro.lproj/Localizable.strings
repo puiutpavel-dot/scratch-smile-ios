@@ -36,6 +36,14 @@
 "lobby.limited" = "EDIȚIE LIMITATĂ";
 "lobby.ticket.info" = "%1$@ 💰 · premiu maxim %2$@ 💰";
 "lobby.disclaimer" = "Monedele sunt virtuale și nu pot fi schimbate în bani sau premii.";
+"share.bonus.row" = "📣 Distribuie și câștigă %@ 💰";
+"share.bonus.title" = "Bonus de distribuire";
+"share.bonus.info" = "Distribuie aplicația pe o rețea socială și primești %@ 💰. Bonusul se acordă o singură dată pentru fiecare rețea.";
+"share.bonus.button" = "Distribuie acum";
+"share.bonus.done" = "Primit";
+"share.bonus.got" = "+%1$@ 💰 pentru %2$@! 🎉";
+"share.bonus.none" = "Mulțumim! Bonusul se acordă doar pentru rețelele din listă, o singură dată.";
+"share.bonus.text" = "Răzuiesc lozuri virtuale în %@. Încearcă și tu! 🎟️";
 "messages.title" = "Mesaje";
 "messages.collection" = "Colecția ta: %1$@ din %2$@";
 "messages.locked" = "🔒 Încă nedescoperit";

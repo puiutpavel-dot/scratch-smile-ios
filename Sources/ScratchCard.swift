@@ -260,6 +260,7 @@ struct TicketScreen: View {
     @State private var shareImage: Image?
     @State private var sharePNG: Data?
     @State private var showMessageComposer = false
+    @State private var showShareSheet = false
     @State private var showConfetti = false
     @AppStorage("didOnboard") private var didOnboard = false
     @AppStorage("seenMessages") private var seenMessages = ""
@@ -320,9 +321,9 @@ struct TicketScreen: View {
 
             Text(resultText).font(.headline).multilineTextAlignment(.center)
 
-            if let shareImage {
+            if shareImage != nil {
                 HStack(spacing: 16) {
-                    ShareLink(item: shareImage, preview: SharePreview(appName, image: shareImage)) {
+                    Button { showShareSheet = true } label: {
                         Label(L("share.friend"), systemImage: "square.and.arrow.up")
                     }
                     if MFMessageComposeViewController.canSendText() {
@@ -351,12 +352,30 @@ struct TicketScreen: View {
                 resultText = L("welcome")
             }
         }
+        .sheet(isPresented: $showShareSheet) {
+            // Share-ul rezultatului contează și el pentru bonusul pe rețele.
+            ActivitySheet(items: resultShareItems) { activityType, completed in
+                showShareSheet = false
+                if let network = ShareRewards.handle(activityType: activityType, completed: completed) {
+                    resultText = L("share.bonus.got", ShareRewards.amountText, network.title)
+                }
+            }
+            .presentationDetents([.medium, .large])
+        }
         .sheet(isPresented: $showMessageComposer) {
             MessageComposer(text: resultText + "\n— " + appName, imageData: sharePNG)
                 .ignoresSafeArea()
         }
         // Dacă jucătorul iese fără să răzuiască, premiul se plătește oricum.
         .onDisappear { if let ticket { settle(ticket, celebrate: false) } }
+    }
+
+    private var resultShareItems: [Any] {
+        var items: [Any] = []
+        if let sharePNG, let image = UIImage(data: sharePNG) { items.append(image) }
+        items.append(resultText + "\n— " + appName)
+        if let url = URL(string: appStoreURL) { items.append(url) }
+        return items
     }
 
     private func buy() {
@@ -756,6 +775,7 @@ struct LobbyScreen: View {
 
                     Button(L("lobby.leaderboard")) { GameCenter.showLeaderboard() }
                     NavigationLink(L("lobby.messages")) { MessagesScreen() }
+                    NavigationLink(L("share.bonus.row", ShareRewards.amountText)) { ShareBonusScreen() }
                 }
 
                 Section(L("lobby.choose")) {
