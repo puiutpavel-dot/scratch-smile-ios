@@ -16,6 +16,14 @@
 "ticket.dec1" = "Raspadinha Dia da Romênia";
 "ticket.christmas" = "Raspadinha de Natal";
 "ticket.easter" = "Raspadinha de Páscoa";
+"ticket.sweets" = "A Confeitaria";
+"ticket.ocean" = "Tesouro do Oceano";
+"ticket.safari" = "Safári";
+"ticket.space" = "Aventura Espacial";
+"ticket.pirates" = "Tesouro dos Piratas";
+"ticket.valentine" = "São Valentim";
+"ticket.halloween" = "Halloween";
+"ticket.newyear" = "Réveillon";
 "lobby.bonus.claim" = "🎁 Bônus dia %1$@ de 7 (+%2$@ 💰)";
 "lobby.bonus.taken" = "Bônus de hoje resgatado (dia %@ de 7). Volte amanhã!";
 "lobby.free" = "🎟️ Raspadinha de Bronze grátis";

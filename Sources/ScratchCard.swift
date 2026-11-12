@@ -43,6 +43,8 @@ struct Ticket {
     let prize: Int
     let symbols: [String]          // 9 simboluri (grilă 3x3) sau 6 numere la „numărul norocos”
     let luckyNumber: Int?
+    /// Seria tipărită pe loz (decorativă) — identifică și lozul curent pentru resetarea răzuitului.
+    let serial = Int.random(in: 100_000...999_999)
 
     init(type: TicketType) {
         self.price = type.price
@@ -80,6 +82,8 @@ struct ScratchCardView<Content: View>: View {
     var brushWidth: CGFloat = 38            // cam cât vârful degetului
     var revealThreshold: Double = 0.75      // peste 75% răzuit => se dezvăluie tot
     var showHint = false                    // degetul animat de la primul loz
+    var foil: [Color] = TicketStyle.silverFoil   // culorile foliei
+    var foilPattern = ""                         // semnul temei, presărat pe folie
     var onReveal: () -> Void
     @ViewBuilder var content: () -> Content
 
@@ -123,12 +127,11 @@ struct ScratchCardView<Content: View>: View {
         .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 
-    /// Folie argintie cu granulație, ca la un loz adevărat.
+    /// Folie metalică în culorile temei, cu granulație, ca la un loz adevărat.
     private var cover: some View {
         ZStack {
-            LinearGradient(colors: [Color(white: 0.62), Color(white: 0.86), Color(white: 0.58),
-                                    Color(white: 0.80), Color(white: 0.60)],
-                           startPoint: .topLeading, endPoint: .bottomTrailing)
+            LinearGradient(colors: foil, startPoint: .topLeading, endPoint: .bottomTrailing)
+            PatternLayer(symbol: foilPattern, opacity: 0.22, size: 18, spacing: 40)
             Canvas { context, size in
                 for (index, point) in noise.enumerated() {
                     let rect = CGRect(x: point.x * size.width, y: point.y * size.height, width: 1.5, height: 1.5)
@@ -137,8 +140,11 @@ struct ScratchCardView<Content: View>: View {
                 }
             }
             Text(L(tapToReveal ? "cover.tap" : "cover.scratch"))
-                .font(.headline)
-                .foregroundStyle(Color.white.opacity(0.85))
+                .font(.system(.headline, design: .rounded).weight(.heavy))
+                .foregroundStyle(Color.black.opacity(0.5))
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .background(Capsule().fill(Color.white.opacity(0.35)))
         }
     }
 
@@ -269,43 +275,65 @@ struct TicketScreen: View {
     }
 
     var body: some View {
-        VStack(spacing: 24) {
+        VStack(spacing: 14) {
             Text(verbatim: "💰 \(coins)").font(.title2.bold())
                 .navigationTitle(type.title)
+                .navigationBarTitleDisplayMode(.inline)
 
             if let ticket {
                 if let lucky = ticket.luckyNumber {
                     Text(L("lucky.number", "\(lucky)")).font(.title3.bold())
                 }
-                ScratchCardView(showHint: isWelcome, onReveal: { settle(ticket) }) {
-                    LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 3), spacing: 12) {
-                        ForEach(Array(ticket.symbols.enumerated()), id: \.offset) { _, symbol in
-                            Text(symbol).font(.system(size: 44))
+                TicketFrame(type: type, serial: ticket.serial) {
+                    ScratchCardView(showHint: isWelcome, foil: type.style.foil, foilPattern: type.style.pattern,
+                                    onReveal: { settle(ticket) }) {
+                        LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 3), spacing: 10) {
+                            ForEach(Array(ticket.symbols.enumerated()), id: \.offset) { _, symbol in
+                                Text(symbol)
+                                    .font(.system(size: 42, weight: .heavy, design: .rounded))
+                                    .foregroundStyle(Color.black)
+                            }
                         }
+                        .padding()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .background(Color.white.opacity(0.94))
                     }
-                    .padding()
-                    .background(type.color.opacity(0.25))
+                    .frame(height: 230)
+                    .id(ticket.serial)   // resetează răzuitul la loz nou
                 }
-                .frame(height: 280)
-                .id(ticket.symbols.joined())   // resetează răzuitul la loz nou
             } else {
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(Color.secondary.opacity(0.15))
-                    .frame(height: 280)
-                    .overlay(Text(L("ticket.empty")))
+                // Niciun loz cumpărat încă: lozul „sigilat”, cu folia întreagă.
+                TicketFrame(type: type) {
+                    ZStack {
+                        LinearGradient(colors: type.style.foil, startPoint: .topLeading, endPoint: .bottomTrailing)
+                        PatternLayer(symbol: type.style.pattern, opacity: 0.22, size: 18, spacing: 40)
+                        Text(L("ticket.empty"))
+                            .font(.system(.headline, design: .rounded))
+                            .foregroundStyle(Color.black.opacity(0.55))
+                            .multilineTextAlignment(.center)
+                            .padding()
+                    }
+                    .frame(height: 230)
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                }
             }
 
             Text(resultText).font(.headline).multilineTextAlignment(.center)
 
             if let shareImage {
-                ShareLink(item: shareImage, preview: SharePreview(appName, image: shareImage)) {
-                    Label(L("share.friend"), systemImage: "square.and.arrow.up")
-                }
-                if MFMessageComposeViewController.canSendText() {
-                    Button { showMessageComposer = true } label: {
-                        Label(L("share.messages"), systemImage: "message.fill")
+                HStack(spacing: 16) {
+                    ShareLink(item: shareImage, preview: SharePreview(appName, image: shareImage)) {
+                        Label(L("share.friend"), systemImage: "square.and.arrow.up")
+                    }
+                    if MFMessageComposeViewController.canSendText() {
+                        Button { showMessageComposer = true } label: {
+                            Label(L("share.messages"), systemImage: "message.fill")
+                        }
                     }
                 }
+                .font(.subheadline)
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
             }
 
             Button(freeAvailable ? L("buy.free") : L("buy.paid", "\(price)")) { buy() }
@@ -451,7 +479,41 @@ struct TicketType: Identifiable, Hashable {
                    weights: [72, 18, 9, 1], multipliers: [0, 1, 5, 25],
                    game: .luckyNumber),
 
+        // --- Teme permanente ---
+        // Dulciuri: ieftin, câștiguri dese — returnare medie 86%
+        TicketType(id: "sweets", name: "ticket.sweets", emoji: "🍭", price: 50, color: .pink,
+                   weights: [55, 35, 9, 1], multipliers: [0, 1, 4, 15],
+                   symbols: ["🍬", "🍩", "🧁", "🍫", "🍪", "🍭"]),
+        // Ocean — returnare medie 95%
+        TicketType(id: "ocean", name: "ticket.ocean", emoji: "🌊", price: 100, color: .blue,
+                   weights: [65, 25, 9, 1], multipliers: [0, 1, 5, 25],
+                   symbols: ["🐚", "🐠", "🐙", "🦀", "⚓️", "🌴"]),
+        // Safari — returnare medie 95%
+        TicketType(id: "safari", name: "ticket.safari", emoji: "🦁", price: 150, color: .orange,
+                   weights: [65, 25, 9, 1], multipliers: [0, 1, 5, 25],
+                   symbols: ["🦓", "🦒", "🦁", "🐘", "🦏", "🌿"]),
+        // Spațiu — returnare medie 95%
+        TicketType(id: "space", name: "ticket.space", emoji: "🚀", price: 200, color: .indigo,
+                   weights: [70, 20, 9, 1], multipliers: [0, 1, 5, 30],
+                   symbols: ["⭐️", "🪐", "🚀", "👽", "🌙", "☄️"]),
+        // Pirați: scump, câștiguri rare și mari — returnare medie 98%
+        TicketType(id: "pirates", name: "ticket.pirates", emoji: "🏴‍☠️", price: 300, color: .brown,
+                   weights: [76, 15, 8, 1], multipliers: [0, 1, 6, 35],
+                   symbols: ["🗝️", "🦜", "💎", "⚓️", "🗺️", "⚔️"]),
+
         // --- Ediții limitate ---
+        TicketType(id: "valentine", name: "ticket.valentine", emoji: "❤️", price: 100, color: .red,
+                   weights: [65, 25, 9, 1], multipliers: [0, 1, 5, 25],
+                   symbols: ["🌹", "💌", "💍", "🍫", "🧸", "💘"],
+                   season: Season(fromMonth: 2, fromDay: 8, toMonth: 2, toDay: 15)),
+        TicketType(id: "halloween", name: "ticket.halloween", emoji: "🎃", price: 100, color: .orange,
+                   weights: [65, 25, 9, 1], multipliers: [0, 1, 5, 25],
+                   symbols: ["🍬", "👻", "🎃", "🦇", "🕷️", "🕯️"],
+                   season: Season(fromMonth: 10, fromDay: 24, toMonth: 11, toDay: 1)),
+        TicketType(id: "newyear", name: "ticket.newyear", emoji: "🎆", price: 200, color: .indigo,
+                   weights: [65, 25, 9, 1], multipliers: [0, 1, 5, 25],
+                   symbols: ["🥂", "🎆", "🍾", "🎉", "🕛", "✨"],
+                   season: Season(fromMonth: 12, fromDay: 28, toMonth: 12, toDay: 31)),
         TicketType(id: "dec1", name: "ticket.dec1", emoji: "🇷🇴", price: 100, color: .blue,
                    weights: [60, 28, 10, 2], multipliers: [0, 1, 4, 15],
                    symbols: ["🇷🇴", "🦅", "🏰", "🌄", "🎺", "🥁"],
@@ -699,21 +761,33 @@ struct LobbyScreen: View {
                 Section(L("lobby.choose")) {
                     ForEach(TicketType.available) { type in
                         NavigationLink(value: type) {
-                            HStack {
-                                Text(type.emoji).font(.largeTitle)
-                                VStack(alignment: .leading) {
-                                    Text(type.title).font(.headline)
+                            HStack(spacing: 12) {
+                                Text(type.emoji).font(.system(size: 40))
+                                VStack(alignment: .leading, spacing: 3) {
                                     if type.season != nil {
-                                        Text(L("lobby.limited")).font(.caption2.bold()).foregroundStyle(.red)
+                                        Text(L("lobby.limited"))
+                                            .font(.system(.caption2, design: .rounded).weight(.heavy))
+                                            .foregroundStyle(Color.black.opacity(0.8))
+                                            .padding(.horizontal, 7)
+                                            .padding(.vertical, 2)
+                                            .background(Capsule().fill(Color.yellow))
                                     }
+                                    Text(type.title)
+                                        .font(.system(.headline, design: .rounded).weight(.heavy))
+                                        .foregroundStyle(Color.white)
                                     Text(L("lobby.ticket.info", "\(type.price)", "\(type.price * type.multiplier(for: .jackpot))"))
                                         .font(.subheadline)
-                                        .foregroundStyle(.secondary)
+                                        .foregroundStyle(Color.white.opacity(0.85))
                                 }
                             }
-                            .padding(.vertical, 4)
+                            .padding(.vertical, 8)
                         }
-                        .listRowBackground(type.color.opacity(0.15))
+                        .listRowBackground(
+                            ZStack {
+                                type.backgroundGradient
+                                PatternLayer(symbol: type.style.pattern, opacity: 0.14)
+                            }
+                        )
                     }
                 }
             }

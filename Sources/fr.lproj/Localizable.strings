@@ -16,6 +16,14 @@
 "ticket.dec1" = "Ticket Fête de la Roumanie";
 "ticket.christmas" = "Ticket de Noël";
 "ticket.easter" = "Ticket de Pâques";
+"ticket.sweets" = "La Confiserie";
+"ticket.ocean" = "Trésor de l'Océan";
+"ticket.safari" = "Safari";
+"ticket.space" = "Aventure Spatiale";
+"ticket.pirates" = "Trésor des Pirates";
+"ticket.valentine" = "Saint-Valentin";
+"ticket.halloween" = "Halloween";
+"ticket.newyear" = "Réveillon";
 "lobby.bonus.claim" = "🎁 Bonus jour %1$@ sur 7 (+%2$@ 💰)";
 "lobby.bonus.taken" = "Bonus du jour récupéré (jour %@ sur 7). Reviens demain !";
 "lobby.free" = "🎟️ Ticket Bronze gratuit";

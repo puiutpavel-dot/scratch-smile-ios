@@ -16,6 +16,14 @@
 "ticket.dec1" = "Lozul de 1 Decembrie";
 "ticket.christmas" = "Lozul de Crăciun";
 "ticket.easter" = "Lozul de Paște";
+"ticket.sweets" = "Cofetăria";
+"ticket.ocean" = "Comoara Oceanului";
+"ticket.safari" = "Safari";
+"ticket.space" = "Aventură Spațială";
+"ticket.pirates" = "Comoara Piraților";
+"ticket.valentine" = "Ziua Îndrăgostiților";
+"ticket.halloween" = "Halloween";
+"ticket.newyear" = "Revelion";
 "lobby.bonus.claim" = "🎁 Bonus ziua %1$@ din 7 (+%2$@ 💰)";
 "lobby.bonus.taken" = "Bonus luat azi (ziua %@ din 7). Revino mâine!";
 "lobby.free" = "🎟️ Loz de Bronz gratuit";

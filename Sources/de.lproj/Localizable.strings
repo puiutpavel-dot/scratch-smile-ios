@@ -16,6 +16,14 @@
 "ticket.dec1" = "Rumänien-Tag-Los";
 "ticket.christmas" = "Weihnachtslos";
 "ticket.easter" = "Osterlos";
+"ticket.sweets" = "Süßwarenladen";
+"ticket.ocean" = "Schatz des Ozeans";
+"ticket.safari" = "Safari";
+"ticket.space" = "Weltraumabenteuer";
+"ticket.pirates" = "Piratenschatz";
+"ticket.valentine" = "Valentinstag";
+"ticket.halloween" = "Halloween";
+"ticket.newyear" = "Silvester";
 "lobby.bonus.claim" = "🎁 Bonus Tag %1$@ von 7 (+%2$@ 💰)";
 "lobby.bonus.taken" = "Bonus heute abgeholt (Tag %@ von 7). Komm morgen wieder!";
 "lobby.free" = "🎟️ Gratis-Bronzelos";

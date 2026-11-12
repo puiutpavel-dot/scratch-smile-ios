@@ -32,6 +32,15 @@ T = {
     "ticket.christmas": ["Lozul de Crăciun", "Christmas Ticket", "Boleto de Navidad", "Ticket de Noël", "Weihnachtslos", "Biglietto di Natale", "Raspadinha de Natal"],
     "ticket.easter": ["Lozul de Paște", "Easter Ticket", "Boleto de Pascua", "Ticket de Pâques", "Osterlos", "Biglietto di Pasqua", "Raspadinha de Páscoa"],
 
+    "ticket.sweets": ["Cofetăria", "Sweet Shop", "La Pastelería", "La Confiserie", "Süßwarenladen", "La Pasticceria", "A Confeitaria"],
+    "ticket.ocean": ["Comoara Oceanului", "Ocean Treasure", "Tesoro del Océano", "Trésor de l'Océan", "Schatz des Ozeans", "Tesoro dell'Oceano", "Tesouro do Oceano"],
+    "ticket.safari": ["Safari", "Safari", "Safari", "Safari", "Safari", "Safari", "Safári"],
+    "ticket.space": ["Aventură Spațială", "Space Adventure", "Aventura Espacial", "Aventure Spatiale", "Weltraumabenteuer", "Avventura Spaziale", "Aventura Espacial"],
+    "ticket.pirates": ["Comoara Piraților", "Pirate Treasure", "Tesoro Pirata", "Trésor des Pirates", "Piratenschatz", "Tesoro dei Pirati", "Tesouro dos Piratas"],
+    "ticket.valentine": ["Ziua Îndrăgostiților", "Valentine's Day", "San Valentín", "Saint-Valentin", "Valentinstag", "San Valentino", "São Valentim"],
+    "ticket.halloween": ["Halloween", "Halloween", "Halloween", "Halloween", "Halloween", "Halloween", "Halloween"],
+    "ticket.newyear": ["Revelion", "New Year's Eve", "Nochevieja", "Réveillon", "Silvester", "Capodanno", "Réveillon"],
+
     # --- lobby
     "lobby.bonus.claim": ["🎁 Bonus ziua %1$@ din 7 (+%2$@ 💰)", "🎁 Day %1$@ of 7 bonus (+%2$@ 💰)", "🎁 Bono día %1$@ de 7 (+%2$@ 💰)", "🎁 Bonus jour %1$@ sur 7 (+%2$@ 💰)", "🎁 Bonus Tag %1$@ von 7 (+%2$@ 💰)", "🎁 Bonus giorno %1$@ di 7 (+%2$@ 💰)", "🎁 Bônus dia %1$@ de 7 (+%2$@ 💰)"],
     "lobby.bonus.taken": ["Bonus luat azi (ziua %@ din 7). Revino mâine!", "Bonus claimed today (day %@ of 7). Come back tomorrow!", "Bono de hoy cobrado (día %@ de 7). ¡Vuelve mañana!", "Bonus du jour récupéré (jour %@ sur 7). Reviens demain !", "Bonus heute abgeholt (Tag %@ von 7). Komm morgen wieder!", "Bonus di oggi riscosso (giorno %@ di 7). Torna domani!", "Bônus de hoje resgatado (dia %@ de 7). Volte amanhã!"],
