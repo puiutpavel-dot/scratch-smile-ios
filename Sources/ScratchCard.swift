@@ -5,7 +5,7 @@ import GameKit
 import MessageUI
 
 /// Adresa la care îți scriu jucătorii. Schimb-o cu adresa ta de contact.
-let supportEmail = "contact@exemplu.ro"
+let supportEmail = "danieldraghicioiu@gmail.com"
 
 /// Mesajele descoperite sunt ținute ca listă de indici, de forma "0,3,7".
 func seenMessageIndices(_ stored: String) -> Set<Int> {
@@ -46,9 +46,10 @@ struct Ticket {
     /// Seria tipărită pe loz (decorativă) — identifică și lozul curent pentru resetarea răzuitului.
     let serial = Int.random(in: 100_000...999_999)
 
-    init(type: TicketType) {
+    /// `forced` e folosit doar de modul demo, pentru capturile de prezentare.
+    init(type: TicketType, forced: Outcome? = nil) {
         self.price = type.price
-        self.outcome = Outcome.random(weights: type.weights)
+        self.outcome = forced ?? Outcome.random(weights: type.weights)
         self.prize = type.price * type.multiplier(for: outcome)
 
         if type.game == .luckyNumber {
@@ -84,6 +85,7 @@ struct ScratchCardView<Content: View>: View {
     var showHint = false                    // degetul animat de la primul loz
     var foil: [Color] = TicketStyle.silverFoil   // culorile foliei
     var foilPattern = ""                         // semnul temei, presărat pe folie
+    var demoState = 0                            // capturi de prezentare: 1 = pe jumătate răzuit, 2 = dezvăluit
     var onReveal: () -> Void
     @ViewBuilder var content: () -> Content
 
@@ -121,6 +123,17 @@ struct ScratchCardView<Content: View>: View {
                     }
                     .overlay { if showHint && strokes.isEmpty && !tapToReveal { HintFinger() } }
                     .transition(.opacity)
+                }
+            }
+            .onAppear {
+                guard demoState > 0, strokes.isEmpty else { return }
+                if demoState == 2 {
+                    revealed = true
+                } else {
+                    let w = geo.size.width, h = geo.size.height
+                    let zigzag: [(CGFloat, CGFloat)] = [(0.10, 0.20), (0.60, 0.14), (0.14, 0.40), (0.64, 0.36),
+                                                        (0.12, 0.62), (0.60, 0.58), (0.18, 0.86), (0.52, 0.82)]
+                    strokes = [zigzag.map { CGPoint(x: $0.0 * w, y: $0.1 * h) }]
                 }
             }
         }
@@ -284,6 +297,8 @@ struct TicketScreen: View {
     var useFreeTicket = false
     /// true la prima deschidere a aplicației: loz gratuit, cu indiciu de răzuit.
     var isWelcome = false
+    /// Capturi de prezentare: "half" = loz pe jumătate răzuit, "win" = loz câștigător dezvăluit.
+    var demo: String? = nil
     private var price: Int { type.price }
     private var freeAvailable: Bool {
         useFreeTicket && Date().timeIntervalSince1970 - lastFreeTicketTime >= freeTicketInterval
@@ -303,6 +318,7 @@ struct TicketScreen: View {
                 }
                 TicketFrame(type: type, serial: ticket.serial) {
                     ScratchCardView(showHint: isWelcome, foil: type.style.foil, foilPattern: type.style.pattern,
+                                    demoState: demo == "win" ? 2 : (demo == "half" ? 1 : 0),
                                     onReveal: { settle(ticket) }) {
                         LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 3), spacing: 10) {
                             ForEach(Array(ticket.symbols.enumerated()), id: \.offset) { _, symbol in
@@ -367,6 +383,13 @@ struct TicketScreen: View {
         .background(AppBackground())
         .overlay { if showConfetti { ConfettiView() } }
         .onAppear {
+            if let demo, ticket == nil {
+                let demoTicket = Ticket(type: type, forced: demo == "win" ? .jackpot : .medium)
+                settled = false
+                ticket = demoTicket
+                if demo == "win" { settle(demoTicket) }
+                return
+            }
             // Primul loz e din partea casei.
             if isWelcome && !didOnboard && ticket == nil {
                 didOnboard = true
@@ -428,7 +451,9 @@ struct TicketScreen: View {
             if ticket.prize > 0 {
                 Feedback.win()
                 showConfetti = true
-                DispatchQueue.main.asyncAfter(deadline: .now() + 3.5) { showConfetti = false }
+                if demo == nil {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 3.5) { showConfetti = false }
+                }
             } else {
                 Feedback.lose()
             }
@@ -757,6 +782,9 @@ struct LobbyScreen: View {
     @State private var showWelcome = false
     @AppStorage("didOnboard") private var didOnboard = false
     @AppStorage("seenMessages") private var seenMessages = ""
+    /// Capturi de prezentare: ecranul deschis direct la pornire (argumentul -demo).
+    @State private var demoDestination: String?
+    @State private var demoShown = false
 
     private var lastBonusDate: Date { Date(timeIntervalSince1970: lastBonusTime) }
 
@@ -823,8 +851,8 @@ struct LobbyScreen: View {
                                        colors: [Color(hex: 0xFF9F1C), Color(hex: 0xC2410C)])
                         }
 
-                        Button { GameCenter.showLeaderboard() } label: {
-                            ActionTile(emoji: "🏆", title: L("tile.leaderboard"),
+                        NavigationLink { SettingsScreen() } label: {
+                            ActionTile(emoji: "⚙️", title: L("settings.title"),
                                        colors: [Color(hex: 0x3B82F6), Color(hex: 0x1E3A8A)])
                         }
 
@@ -866,9 +894,22 @@ struct LobbyScreen: View {
             }
             .navigationTitle(appName)
             .onAppear {
-                GameCenter.authenticate()
-                GameCenter.submit(coins: coins)
-                if !didOnboard { showWelcome = true }
+                // Game Center (clasament, realizări) rămâne pregătit în cod, dar nu e pornit în versiunea 1.0.
+                if let demo = UserDefaults.standard.string(forKey: "demo"), demoDestination == nil, !demoShown {
+                    demoShown = true
+                    demoDestination = demo
+                } else if !didOnboard {
+                    showWelcome = true
+                }
+            }
+            .navigationDestination(item: $demoDestination) { demo in
+                switch demo {
+                case "half": TicketScreen(type: TicketType.all[2], demo: "half")
+                case "win": TicketScreen(type: TicketType.all.first { $0.id == "space" } ?? TicketType.all[0], demo: "win")
+                case "share": ShareBonusScreen()
+                case "messages": MessagesScreen()
+                default: StatsScreen()
+                }
             }
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
@@ -881,7 +922,6 @@ struct LobbyScreen: View {
             .navigationDestination(isPresented: $showWelcome) {
                 TicketScreen(type: TicketType.all[0], isWelcome: true)
             }
-            .onChange(of: coins) { GameCenter.submit(coins: coins) }
             .navigationDestination(for: TicketType.self) { type in
                 TicketScreen(type: type)
             }

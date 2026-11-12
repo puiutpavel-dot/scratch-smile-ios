@@ -16,6 +16,7 @@ Toate textele sunt în `tools/l10n.py`, câte un rând pe text, cu cele 7 traduc
 - `scripts/` – pregătirea build-ului prin App Store Connect API și semnarea în cloud
 - `tools/l10n.py` – tabelul de traduceri
 - `docs/index.html` – politica de confidențialitate, în engleză și română (pentru GitHub Pages)
+- `fastlane/metadata/` – fișa din App Store în 7 limbi; `fastlane/screenshots/` se generează la build
 
 ## Build
 

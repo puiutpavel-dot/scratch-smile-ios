@@ -1,10 +1,13 @@
 # Build iOS pe GitHub Actions, fără Mac.
 # Pornire: GitHub → Actions → „iOS” → Run workflow → alegi acțiunea.
 #   verificare  – generează proiectul și compilează pentru simulator (nu are nevoie de secrete)
-#   capturi     – verificare + capturi de ecran din simulator (lobby și un loz)
+#   capturi     – verificare + capturi din simulator în română și engleză (se văd în jurnal și în „Artifacts”)
 #   testflight  – verificare + build semnat urcat în TestFlight
+#   app-store   – testflight + capturi în 7 limbi + fișa din App Store (texte, categorie, capturi)
+#   fisa        – doar capturile în 7 limbi + fișa din App Store, fără build nou
+# Trimiterea la App Review rămâne manuală (sau o face Claude, după confirmare).
 #
-# Secrete necesare pentru testflight (Settings → Secrets and variables → Actions):
+# Secrete necesare, în afară de verificare și capturi (Settings → Secrets and variables → Actions):
 #   ASC_KEY_ID, ASC_ISSUER_ID, ASC_PRIVATE_KEY (conținutul fișierului AuthKey_XXXX.p8, cheie cu rol Admin)
 name: iOS
 
@@ -14,7 +17,7 @@ on:
       actiune:
         description: Ce rulez
         type: choice
-        options: [verificare, capturi, testflight]
+        options: [verificare, capturi, testflight, app-store, fisa]
         default: verificare
   push:
     branches: [main]
@@ -27,15 +30,19 @@ concurrency:
 env:
   BUNDLE_ID: ro.draghicioiu.scratchsmile
   APP_NAME: ScratchSmile
+  APP_VERSION: "1.0"
   OUT_DIR: ${{ github.workspace }}/ci-out
   ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
   ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
   ASC_PRIVATE_KEY: ${{ secrets.ASC_PRIVATE_KEY }}
+  APP_STORE_CONNECT_KEY_IDENTIFIER: ${{ secrets.ASC_KEY_ID }}
+  APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+  APP_STORE_CONNECT_PRIVATE_KEY: ${{ secrets.ASC_PRIVATE_KEY }}
 
 jobs:
   ios:
     runs-on: macos-15
-    timeout-minutes: 60
+    timeout-minutes: 75
     steps:
       - uses: actions/checkout@v4
 
@@ -46,7 +53,7 @@ jobs:
           xcodebuild -version
 
       - name: Verifică secretele
-        if: inputs.actiune == 'testflight'
+        if: inputs.actiune == 'testflight' || inputs.actiune == 'app-store' || inputs.actiune == 'fisa'
         run: |
           missing=""
           [ -n "$ASC_KEY_ID" ] || missing="$missing ASC_KEY_ID"
@@ -62,32 +69,52 @@ jobs:
       - name: Build pentru simulator
         run: bash scripts/ci/sim_build.sh
 
-      - name: Capturi de ecran din simulator
-        if: inputs.actiune == 'capturi'
+      - name: Capturi App Store (5 ecrane × 7 limbi)
+        if: inputs.actiune == 'app-store' || inputs.actiune == 'capturi' || inputs.actiune == 'fisa'
+        env:
+          # la „capturi” doar română și engleză, ca să consume mai puține minute
+          SPECS: ${{ inputs.actiune == 'capturi' && 'ro:ro:ro_RO en-US:en:en_US' || '' }}
         run: bash scripts/ci/screenshots.sh
 
+      - name: Miniaturi în jurnal (previzualizare)
+        if: inputs.actiune == 'app-store' || inputs.actiune == 'capturi' || inputs.actiune == 'fisa'
+        run: |
+          mkdir -p /tmp/thumbs
+          for f in ci-out/screenshots/ro_*.png ci-out/screenshots/en-US_01*.png; do
+            n=$(basename "$f" .png)
+            sips -s format jpeg -s formatOptions 55 --resampleWidth 330 "$f" --out "/tmp/thumbs/$n.jpg" >/dev/null
+            echo "THUMB:$n:$(base64 -i "/tmp/thumbs/$n.jpg" | tr -d '\n')"
+          done
+
       - uses: actions/setup-python@v5
-        if: inputs.actiune == 'testflight'
+        if: inputs.actiune == 'testflight' || inputs.actiune == 'app-store' || inputs.actiune == 'fisa'
         with:
           python-version: "3.12"
 
       - name: App Store Connect — Bundle ID, echipă, Game Center, număr de build
-        if: inputs.actiune == 'testflight'
+        if: inputs.actiune == 'testflight' || inputs.actiune == 'app-store'
         run: |
           pip install -q pyjwt cryptography
           python scripts/asc_prepare.py
 
       - name: Arhivă semnată + urcare în TestFlight
-        if: inputs.actiune == 'testflight'
+        if: inputs.actiune == 'testflight' || inputs.actiune == 'app-store'
         run: bash scripts/ci/archive_upload.sh
 
-      - name: Jurnale
+      - name: Fișa din App Store (texte + categorie + capturi)
+        if: inputs.actiune == 'app-store' || inputs.actiune == 'fisa'
+        run: |
+          pip install -q pyjwt cryptography
+          python scripts/asc_listing.py
+          python scripts/asc_status.py
+
+      - name: Capturi și jurnale
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: jurnale-${{ github.run_number }}
+          name: rezultate-${{ inputs.actiune || 'push' }}-${{ github.run_number }}
           if-no-files-found: ignore
           retention-days: 14
           path: |
+            ci-out/screenshots/*.png
             ci-out/*.log
-            ci-out/*.png

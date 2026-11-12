@@ -6,3 +6,4 @@ build/
 dd/
 ci-out/
 __pycache__/
+fastlane/screenshots/
