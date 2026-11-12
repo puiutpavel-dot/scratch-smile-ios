@@ -1,0 +1,11 @@
+Scratch & Smile is a casual scratch card game that uses virtual coins only.
+
+- No real-money gambling: coins cannot be purchased, sold or exchanged for money, goods or prizes. There are no in-app purchases, no ads, no accounts and no login.
+- Simulated gambling is declared in the age rating questionnaire.
+- All data (coin balance, statistics, settings) is stored on the device only; the app collects no user data.
+
+How to test: on first launch the app opens a complimentary Bronze ticket. Scratch the foil with your finger; the ticket is revealed once about 75% of the surface is scratched. Back on the main screen you can claim the daily bonus, open any ticket and tap "Buy ticket". In Settings, "Tap to reveal" replaces scratching with a single tap (accessibility option).
+
+Share bonus (optional): the "Share" tile opens the system share sheet with a text and the App Store link. When the user completes a share in one of the listed social apps, the app adds virtual coins once per network. Sharing is never required to use the app.
+
+The app is localized in English, Romanian, Spanish, French, German, Italian and Portuguese (Brazil) and follows the device language.
