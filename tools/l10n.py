@@ -45,6 +45,12 @@ T = {
     "ticket.newyear": ["Revelion", "New Year's Eve", "Nochevieja", "Réveillon", "Silvester", "Capodanno", "Réveillon"],
 
     # --- lobby
+    "wallet.title": ["MONEDELE TALE", "YOUR COINS", "TUS MONEDAS", "TES PIÈCES", "DEINE MÜNZEN", "LE TUE MONETE", "SUAS MOEDAS"],
+    "tile.bonus": ["Bonus zilnic", "Daily bonus", "Bono diario", "Bonus du jour", "Tagesbonus", "Bonus giornaliero", "Bônus diário"],
+    "tile.free": ["Loz gratuit", "Free ticket", "Boleto gratis", "Ticket gratuit", "Gratis-Los", "Biglietto gratis", "Raspadinha grátis"],
+    "tile.ready": ["Gata!", "Ready!", "¡Listo!", "Prêt !", "Bereit!", "Pronto!", "Pronto!"],
+    "tile.leaderboard": ["Clasament", "Leaderboard", "Clasificación", "Classement", "Bestenliste", "Classifica", "Classificação"],
+    "tile.share": ["Distribuie", "Share", "Compartir", "Partager", "Teilen", "Condividi", "Compartilhar"],
     "lobby.bonus.claim": ["🎁 Bonus ziua %1$@ din 7 (+%2$@ 💰)", "🎁 Day %1$@ of 7 bonus (+%2$@ 💰)", "🎁 Bono día %1$@ de 7 (+%2$@ 💰)", "🎁 Bonus jour %1$@ sur 7 (+%2$@ 💰)", "🎁 Bonus Tag %1$@ von 7 (+%2$@ 💰)", "🎁 Bonus giorno %1$@ di 7 (+%2$@ 💰)", "🎁 Bônus dia %1$@ de 7 (+%2$@ 💰)"],
     "lobby.bonus.taken": ["Bonus luat azi (ziua %@ din 7). Revino mâine!", "Bonus claimed today (day %@ of 7). Come back tomorrow!", "Bono de hoy cobrado (día %@ de 7). ¡Vuelve mañana!", "Bonus du jour récupéré (jour %@ sur 7). Reviens demain !", "Bonus heute abgeholt (Tag %@ von 7). Komm morgen wieder!", "Bonus di oggi riscosso (giorno %@ di 7). Torna domani!", "Bônus de hoje resgatado (dia %@ de 7). Volte amanhã!"],
     "lobby.free": ["🎟️ Loz de Bronz gratuit", "🎟️ Free Bronze Ticket", "🎟️ Boleto de Bronce gratis", "🎟️ Ticket Bronze gratuit", "🎟️ Gratis-Bronzelos", "🎟️ Biglietto di Bronzo gratis", "🎟️ Raspadinha de Bronze grátis"],

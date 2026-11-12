@@ -26,6 +26,12 @@
 "ticket.valentine" = "San Valentino";
 "ticket.halloween" = "Halloween";
 "ticket.newyear" = "Capodanno";
+"wallet.title" = "LE TUE MONETE";
+"tile.bonus" = "Bonus giornaliero";
+"tile.free" = "Biglietto gratis";
+"tile.ready" = "Pronto!";
+"tile.leaderboard" = "Classifica";
+"tile.share" = "Condividi";
 "lobby.bonus.claim" = "🎁 Bonus giorno %1$@ di 7 (+%2$@ 💰)";
 "lobby.bonus.taken" = "Bonus di oggi riscosso (giorno %@ di 7). Torna domani!";
 "lobby.free" = "🎟️ Biglietto di Bronzo gratis";

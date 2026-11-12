@@ -135,7 +135,10 @@ struct TicketFrame<Content: View>: View {
                 .padding(.horizontal, 16)
 
             content()
-                .padding(.horizontal, 14)
+                .padding(4)
+                .background(RoundedRectangle(cornerRadius: 20).fill(Palette.goldGradient))
+                .shadow(color: Color.black.opacity(0.3), radius: 4, y: 2)
+                .padding(.horizontal, 12)
                 .padding(.top, 12)
 
             footer
@@ -148,17 +151,34 @@ struct TicketFrame<Content: View>: View {
                 PatternLayer(symbol: type.style.pattern)
             }
         }
+        // Chenar punctat interior + ramă aurie pe conturul biletului.
+        .overlay {
+            RoundedRectangle(cornerRadius: 14)
+                .strokeBorder(Color.white.opacity(0.3), style: StrokeStyle(lineWidth: 1, dash: [2, 4]))
+                .padding(6)
+                .allowsHitTesting(false)
+        }
+        .overlay {
+            TicketShape(notchY: headerHeight)
+                .stroke(Palette.goldGradient, lineWidth: 6)
+                .allowsHitTesting(false)
+        }
         .clipShape(TicketShape(notchY: headerHeight), style: FillStyle(eoFill: true))
-        .shadow(color: Color.black.opacity(0.25), radius: 8, y: 4)
+        .shadow(color: (type.style.background.last ?? .black).opacity(0.6), radius: 12, y: 6)
     }
 
     private var header: some View {
         HStack(spacing: 10) {
-            Text(type.emoji).font(.system(size: 34))
+            ZStack {
+                RotatingBurst().frame(width: 70, height: 70)
+                Text(type.emoji).font(.system(size: 36)).shadow(color: Color.black.opacity(0.4), radius: 3, y: 2)
+            }
+            .frame(width: 46, height: 46)
             VStack(alignment: .leading, spacing: 2) {
                 Text(type.title)
-                    .font(.system(.title3, design: .rounded).weight(.heavy))
+                    .font(.system(.title3, design: .rounded).weight(.black))
                     .foregroundStyle(Color.white)
+                    .shadow(color: Color.black.opacity(0.5), radius: 2, y: 1)
                     .lineLimit(1)
                     .minimumScaleFactor(0.6)
                 if let serial {
@@ -173,7 +193,8 @@ struct TicketFrame<Content: View>: View {
                 .foregroundStyle(Color.black.opacity(0.8))
                 .padding(.horizontal, 10)
                 .padding(.vertical, 5)
-                .background(Capsule().fill(Color.white.opacity(0.9)))
+                .background(Capsule().fill(Palette.goldGradient))
+                .overlay(Capsule().strokeBorder(Color.white.opacity(0.7), lineWidth: 1))
         }
         .padding(.horizontal, 16)
     }
@@ -187,6 +208,9 @@ struct TicketFrame<Content: View>: View {
                 .multilineTextAlignment(.center)
                 .lineLimit(2)
                 .minimumScaleFactor(0.8)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 4)
+                .background(Capsule().fill(Color.black.opacity(0.3)))
             prizeTable
         }
     }
@@ -199,10 +223,14 @@ struct TicketFrame<Content: View>: View {
                 Text(verbatim: type.game == .luckyNumber
                      ? "🍀\(String(repeating: "★", count: index + 1)) \(prize)"
                      : "\(type.symbol(for: outcome))×3 = \(prize)")
-                    .font(.system(.caption, design: .rounded).weight(.semibold))
-                    .foregroundStyle(Color.white)
+                    .font(.system(.caption, design: .rounded).weight(.heavy))
+                    .foregroundStyle(Color(hex: 0xFFE27A))
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(Capsule().fill(Color.black.opacity(0.4)))
+                    .overlay(Capsule().strokeBorder(Palette.goldGradient, lineWidth: 1))
             }
         }
     }

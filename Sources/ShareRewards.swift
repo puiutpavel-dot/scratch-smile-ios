@@ -115,7 +115,8 @@ struct ShareBonusScreen: View {
                     Label(L("share.bonus.button"), systemImage: "square.and.arrow.up")
                         .frame(maxWidth: .infinity)
                 }
-                .buttonStyle(.borderedProminent)
+                .buttonStyle(GlossyButtonStyle())
+                .listRowBackground(Color.clear)
                 if !notice.isEmpty {
                     Text(notice).font(.headline).multilineTextAlignment(.center)
                 }
@@ -136,6 +137,8 @@ struct ShareBonusScreen: View {
             }
         }
         .navigationTitle(L("share.bonus.title"))
+        .scrollContentBackground(.hidden)
+        .background(AppBackground())
         .sheet(isPresented: $showSheet) {
             ActivitySheet(items: shareItems) { activityType, completed in
                 showSheet = false

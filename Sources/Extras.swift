@@ -182,6 +182,8 @@ struct StatsScreen: View {
             }
         }
         .navigationTitle(L("stats.title"))
+        .scrollContentBackground(.hidden)
+        .background(AppBackground())
     }
 }
 
@@ -205,5 +207,7 @@ struct SettingsScreen: View {
             }
         }
         .navigationTitle(L("settings.title"))
+        .scrollContentBackground(.hidden)
+        .background(AppBackground())
     }
 }

@@ -26,6 +26,12 @@
 "ticket.valentine" = "Ziua Îndrăgostiților";
 "ticket.halloween" = "Halloween";
 "ticket.newyear" = "Revelion";
+"wallet.title" = "MONEDELE TALE";
+"tile.bonus" = "Bonus zilnic";
+"tile.free" = "Loz gratuit";
+"tile.ready" = "Gata!";
+"tile.leaderboard" = "Clasament";
+"tile.share" = "Distribuie";
 "lobby.bonus.claim" = "🎁 Bonus ziua %1$@ din 7 (+%2$@ 💰)";
 "lobby.bonus.taken" = "Bonus luat azi (ziua %@ din 7). Revino mâine!";
 "lobby.free" = "🎟️ Loz de Bronz gratuit";

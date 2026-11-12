@@ -132,6 +132,17 @@ struct ScratchCardView<Content: View>: View {
         ZStack {
             LinearGradient(colors: foil, startPoint: .topLeading, endPoint: .bottomTrailing)
             PatternLayer(symbol: foilPattern, opacity: 0.22, size: 18, spacing: 40)
+            // Dungi fine în diagonală, ca la folia metalică.
+            Canvas { context, size in
+                var x: CGFloat = -size.height
+                while x < size.width {
+                    var line = Path()
+                    line.move(to: CGPoint(x: x, y: size.height))
+                    line.addLine(to: CGPoint(x: x + size.height, y: 0))
+                    context.stroke(line, with: .color(Color.white.opacity(0.16)), lineWidth: 2)
+                    x += 14
+                }
+            }
             Canvas { context, size in
                 for (index, point) in noise.enumerated() {
                     let rect = CGRect(x: point.x * size.width, y: point.y * size.height, width: 1.5, height: 1.5)
@@ -144,8 +155,10 @@ struct ScratchCardView<Content: View>: View {
                 .foregroundStyle(Color.black.opacity(0.5))
                 .padding(.horizontal, 12)
                 .padding(.vertical, 6)
-                .background(Capsule().fill(Color.white.opacity(0.35)))
+                .background(Capsule().fill(Color.white.opacity(0.45)))
+                .overlay(Capsule().strokeBorder(Color.white.opacity(0.8), lineWidth: 1.5))
         }
+        .modifier(Shine(period: 3.4))
     }
 
     /// Masca: totul opac, mai puțin urmele degetului (șterse cu destinationOut).
@@ -261,6 +274,7 @@ struct TicketScreen: View {
     @State private var sharePNG: Data?
     @State private var showMessageComposer = false
     @State private var showShareSheet = false
+    @State private var resultIsWin = false
     @State private var showConfetti = false
     @AppStorage("didOnboard") private var didOnboard = false
     @AppStorage("seenMessages") private var seenMessages = ""
@@ -277,13 +291,15 @@ struct TicketScreen: View {
 
     var body: some View {
         VStack(spacing: 14) {
-            Text(verbatim: "💰 \(coins)").font(.title2.bold())
+            CoinPill(coins: coins)
                 .navigationTitle(type.title)
                 .navigationBarTitleDisplayMode(.inline)
 
             if let ticket {
                 if let lucky = ticket.luckyNumber {
-                    Text(L("lucky.number", "\(lucky)")).font(.title3.bold())
+                    Text(L("lucky.number", "\(lucky)"))
+                        .font(.system(.title3, design: .rounded).weight(.black))
+                        .foregroundStyle(Palette.goldGradient)
                 }
                 TicketFrame(type: type, serial: ticket.serial) {
                     ScratchCardView(showHint: isWelcome, foil: type.style.foil, foilPattern: type.style.pattern,
@@ -291,13 +307,20 @@ struct TicketScreen: View {
                         LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 3), spacing: 10) {
                             ForEach(Array(ticket.symbols.enumerated()), id: \.offset) { _, symbol in
                                 Text(symbol)
-                                    .font(.system(size: 42, weight: .heavy, design: .rounded))
+                                    .font(.system(size: 38, weight: .heavy, design: .rounded))
                                     .foregroundStyle(Color.black)
+                                    .frame(maxWidth: .infinity, minHeight: 58)
+                                    .background(RoundedRectangle(cornerRadius: 12).fill(
+                                        LinearGradient(colors: [Color.white, Color(hex: 0xF1E9D2)],
+                                                       startPoint: .top, endPoint: .bottom)))
+                                    .overlay(RoundedRectangle(cornerRadius: 12)
+                                        .strokeBorder(Color(hex: 0xC9A84A), lineWidth: 1.5))
+                                    .shadow(color: Color.black.opacity(0.12), radius: 1.5, y: 1)
                             }
                         }
-                        .padding()
+                        .padding(12)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .background(Color.white.opacity(0.94))
+                        .background(Color(hex: 0xFBF4DE))
                     }
                     .frame(height: 230)
                     .id(ticket.serial)   // resetează răzuitul la loz nou
@@ -319,7 +342,7 @@ struct TicketScreen: View {
                 }
             }
 
-            Text(resultText).font(.headline).multilineTextAlignment(.center)
+            ResultBanner(text: resultText, isWin: resultIsWin)
 
             if shareImage != nil {
                 HStack(spacing: 16) {
@@ -332,16 +355,16 @@ struct TicketScreen: View {
                         }
                     }
                 }
-                .font(.subheadline)
-                .lineLimit(1)
-                .minimumScaleFactor(0.7)
+                .buttonStyle(GlassButtonStyle())
             }
 
             Button(freeAvailable ? L("buy.free") : L("buy.paid", "\(price)")) { buy() }
-                .buttonStyle(.borderedProminent)
+                .buttonStyle(GlossyButtonStyle())
                 .disabled(!freeAvailable && coins < price)
         }
         .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(AppBackground())
         .overlay { if showConfetti { ConfettiView() } }
         .onAppear {
             // Primul loz e din partea casei.
@@ -350,6 +373,7 @@ struct TicketScreen: View {
                 settled = false
                 ticket = Ticket(type: type)
                 resultText = L("welcome")
+                resultIsWin = false
             }
         }
         .sheet(isPresented: $showShareSheet) {
@@ -358,6 +382,7 @@ struct TicketScreen: View {
                 showShareSheet = false
                 if let network = ShareRewards.handle(activityType: activityType, completed: completed) {
                     resultText = L("share.bonus.got", ShareRewards.amountText, network.title)
+                    resultIsWin = true
                 }
             }
             .presentationDetents([.medium, .large])
@@ -408,7 +433,8 @@ struct TicketScreen: View {
                 Feedback.lose()
             }
         }
-        resultText = ticket.prize > 0 ? L("win", "\(ticket.prize)") : nextLosingMessage()
+        resultIsWin = ticket.prize > 0
+        resultText = resultIsWin ? L("win", "\(ticket.prize)") : nextLosingMessage()
 
         // Imaginea pentru butonul „Trimite”.
         let renderer = ImageRenderer(content: ShareCard(text: resultText, emoji: type.emoji))
@@ -618,6 +644,8 @@ struct MessagesScreen: View {
             }
         }
         .navigationTitle(L("messages.title"))
+        .scrollContentBackground(.hidden)
+        .background(AppBackground())
     }
 }
 
@@ -726,6 +754,7 @@ struct LobbyScreen: View {
     @State private var showFreeTicket = false
     @State private var showWelcome = false
     @AppStorage("didOnboard") private var didOnboard = false
+    @AppStorage("seenMessages") private var seenMessages = ""
 
     private var lastBonusDate: Date { Date(timeIntervalSince1970: lastBonusTime) }
 
@@ -746,71 +775,84 @@ struct LobbyScreen: View {
         let remaining = freeTicketInterval - (now.timeIntervalSince1970 - lastFreeTicketTime)
         guard remaining > 0 else { return nil }
         let minutes = Int(remaining / 60) + 1
-        return L("lobby.free.wait", "\(minutes / 60)h \(minutes % 60)m")
+        return "\(minutes / 60)h \(minutes % 60)m"
+    }
+
+    private func claimBonus() {
+        let day = nextStreakDay
+        coins += dailyBonus
+        bonusStreak = day
+        lastBonusTime = Date().timeIntervalSince1970
+        Reminders.streakReminder(day: day)
+        Stats.recordStreak(day)
+        Feedback.win()
     }
 
     var body: some View {
         NavigationStack {
-            List {
-                Section {
-                    Text(verbatim: "💰 \(coins)").font(.title.bold())
-                    Button(bonusAvailable
-                           ? L("lobby.bonus.claim", "\(nextStreakDay)", "\(dailyBonus)")
-                           : L("lobby.bonus.taken", "\(bonusStreak)")) {
-                        let day = nextStreakDay
-                        coins += dailyBonus
-                        bonusStreak = day
-                        lastBonusTime = Date().timeIntervalSince1970
-                        Reminders.streakReminder(day: day)
-                        Stats.recordStreak(day)
-                    }
-                    .disabled(!bonusAvailable)
+            ScrollView {
+                VStack(spacing: 16) {
+                    WalletPanel(coins: coins)
 
-                    // Se reîmprospătează singur în fiecare minut.
-                    TimelineView(.periodic(from: .now, by: 60)) { context in
-                        let waiting = freeTicketLabel(at: context.date)
-                        Button(waiting ?? L("lobby.free")) { showFreeTicket = true }
-                            .disabled(waiting != nil)
-                    }
-
-                    Button(L("lobby.leaderboard")) { GameCenter.showLeaderboard() }
-                    NavigationLink(L("lobby.messages")) { MessagesScreen() }
-                    NavigationLink(L("share.bonus.row", ShareRewards.amountText)) { ShareBonusScreen() }
-                }
-
-                Section(L("lobby.choose")) {
-                    ForEach(TicketType.available) { type in
-                        NavigationLink(value: type) {
-                            HStack(spacing: 12) {
-                                Text(type.emoji).font(.system(size: 40))
-                                VStack(alignment: .leading, spacing: 3) {
-                                    if type.season != nil {
-                                        Text(L("lobby.limited"))
-                                            .font(.system(.caption2, design: .rounded).weight(.heavy))
-                                            .foregroundStyle(Color.black.opacity(0.8))
-                                            .padding(.horizontal, 7)
-                                            .padding(.vertical, 2)
-                                            .background(Capsule().fill(Color.yellow))
-                                    }
-                                    Text(type.title)
-                                        .font(.system(.headline, design: .rounded).weight(.heavy))
-                                        .foregroundStyle(Color.white)
-                                    Text(L("lobby.ticket.info", "\(type.price)", "\(type.price * type.multiplier(for: .jackpot))"))
-                                        .font(.subheadline)
-                                        .foregroundStyle(Color.white.opacity(0.85))
-                                }
-                            }
-                            .padding(.vertical, 8)
+                    LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 3), spacing: 10) {
+                        Button { claimBonus() } label: {
+                            ActionTile(emoji: "🎁", title: L("tile.bonus"),
+                                       subtitle: bonusAvailable ? "+\(dailyBonus) 💰 · \(nextStreakDay)/7" : "✓ \(bonusStreak)/7",
+                                       colors: [Color(hex: 0xE8457A), Color(hex: 0x9B1B5A)],
+                                       highlighted: bonusAvailable)
                         }
-                        .listRowBackground(
-                            ZStack {
-                                type.backgroundGradient
-                                PatternLayer(symbol: type.style.pattern, opacity: 0.14)
+                        .disabled(!bonusAvailable)
+
+                        // Se reîmprospătează singur în fiecare minut.
+                        TimelineView(.periodic(from: .now, by: 60)) { context in
+                            let waiting = freeTicketLabel(at: context.date)
+                            Button { showFreeTicket = true } label: {
+                                ActionTile(emoji: "🎟️", title: L("tile.free"),
+                                           subtitle: waiting ?? L("tile.ready"),
+                                           colors: [Color(hex: 0x2FBF71), Color(hex: 0x0B6E4F)],
+                                           highlighted: waiting == nil)
                             }
-                        )
+                            .disabled(waiting != nil)
+                        }
+
+                        NavigationLink { ShareBonusScreen() } label: {
+                            ActionTile(emoji: "📣", title: L("tile.share"),
+                                       subtitle: "+\(ShareRewards.amountText) 💰",
+                                       colors: [Color(hex: 0xFF9F1C), Color(hex: 0xC2410C)])
+                        }
+
+                        Button { GameCenter.showLeaderboard() } label: {
+                            ActionTile(emoji: "🏆", title: L("tile.leaderboard"),
+                                       colors: [Color(hex: 0x3B82F6), Color(hex: 0x1E3A8A)])
+                        }
+
+                        NavigationLink { MessagesScreen() } label: {
+                            ActionTile(emoji: "💬", title: L("messages.title"),
+                                       subtitle: "\(seenMessageIndices(seenMessages).count)/\(TicketScreen.losingMessageCount)",
+                                       colors: [Color(hex: 0x8B5CF6), Color(hex: 0x4C1D95)])
+                        }
+
+                        NavigationLink { StatsScreen() } label: {
+                            ActionTile(emoji: "📊", title: L("stats.title"),
+                                       colors: [Color(hex: 0x14B8A6), Color(hex: 0x115E59)])
+                        }
+                    }
+                    .buttonStyle(.plain)
+
+                    SectionTitle(text: L("lobby.choose"))
+
+                    LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 12), count: 2), spacing: 12) {
+                        ForEach(Array(TicketType.available.enumerated()), id: \.element.id) { index, type in
+                            NavigationLink(value: type) {
+                                LobbyTicketCard(type: type, phase: Double(index) * 0.45)
+                            }
+                            .buttonStyle(.plain)
+                        }
                     }
                 }
+                .padding(16)
             }
+            .background(AppBackground())
             .safeAreaInset(edge: .bottom) {
                 Text(L("lobby.disclaimer"))
                     .font(.footnote)
@@ -818,7 +860,7 @@ struct LobbyScreen: View {
                     .multilineTextAlignment(.center)
                     .padding(8)
                     .frame(maxWidth: .infinity)
-                    .background(.bar)
+                    .background(.ultraThinMaterial)
             }
             .navigationTitle(appName)
             .onAppear {

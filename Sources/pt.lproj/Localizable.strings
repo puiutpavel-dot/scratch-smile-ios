@@ -26,6 +26,12 @@
 "ticket.valentine" = "São Valentim";
 "ticket.halloween" = "Halloween";
 "ticket.newyear" = "Réveillon";
+"wallet.title" = "SUAS MOEDAS";
+"tile.bonus" = "Bônus diário";
+"tile.free" = "Raspadinha grátis";
+"tile.ready" = "Pronto!";
+"tile.leaderboard" = "Classificação";
+"tile.share" = "Compartilhar";
 "lobby.bonus.claim" = "🎁 Bônus dia %1$@ de 7 (+%2$@ 💰)";
 "lobby.bonus.taken" = "Bônus de hoje resgatado (dia %@ de 7). Volte amanhã!";
 "lobby.free" = "🎟️ Raspadinha de Bronze grátis";

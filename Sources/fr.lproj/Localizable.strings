@@ -26,6 +26,12 @@
 "ticket.valentine" = "Saint-Valentin";
 "ticket.halloween" = "Halloween";
 "ticket.newyear" = "Réveillon";
+"wallet.title" = "TES PIÈCES";
+"tile.bonus" = "Bonus du jour";
+"tile.free" = "Ticket gratuit";
+"tile.ready" = "Prêt !";
+"tile.leaderboard" = "Classement";
+"tile.share" = "Partager";
 "lobby.bonus.claim" = "🎁 Bonus jour %1$@ sur 7 (+%2$@ 💰)";
 "lobby.bonus.taken" = "Bonus du jour récupéré (jour %@ sur 7). Reviens demain !";
 "lobby.free" = "🎟️ Ticket Bronze gratuit";
