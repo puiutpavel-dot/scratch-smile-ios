@@ -127,14 +127,7 @@ struct ScratchCardView<Content: View>: View {
             }
             .onAppear {
                 guard demoState > 0, strokes.isEmpty else { return }
-                if demoState == 2 {
-                    revealed = true
-                } else {
-                    let w = geo.size.width, h = geo.size.height
-                    let zigzag: [(CGFloat, CGFloat)] = [(0.10, 0.20), (0.60, 0.14), (0.14, 0.40), (0.64, 0.36),
-                                                        (0.12, 0.62), (0.60, 0.58), (0.18, 0.86), (0.52, 0.82)]
-                    strokes = [zigzag.map { CGPoint(x: $0.0 * w, y: $0.1 * h) }]
-                }
+                if demoState == 2 { revealed = true }
             }
         }
         .clipShape(RoundedRectangle(cornerRadius: 16))
@@ -187,6 +180,15 @@ struct ScratchCardView<Content: View>: View {
             }
             for crumb in crumbs {
                 context.fill(Path(ellipseIn: crumb), with: .color(.black))
+            }
+            if demoState == 1 {
+                // Capturi de prezentare: o urmă în zigzag peste jumătatea stângă a foliei.
+                let zigzag: [(CGFloat, CGFloat)] = [(0.10, 0.20), (0.62, 0.14), (0.14, 0.40), (0.66, 0.36),
+                                                    (0.12, 0.62), (0.62, 0.58), (0.18, 0.86), (0.54, 0.82)]
+                var path = Path()
+                path.addLines(zigzag.map { CGPoint(x: $0.0 * size.width, y: $0.1 * size.height) })
+                context.stroke(path, with: .color(.black),
+                               style: StrokeStyle(lineWidth: brushWidth * 1.5, lineCap: .round, lineJoin: .round))
             }
         }
     }
